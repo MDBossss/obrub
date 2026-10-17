@@ -1,4 +1,4 @@
-# Plan dvorišta
+# Obrub
 
 Planer rubnjaka za dvorište. Oblike slažeš na platnu, a za svaki oblik i za cijelo dvorište
 aplikacija računa komade od 100 i 33 cm, rezove, težinu i cijenu.

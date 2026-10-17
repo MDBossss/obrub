@@ -154,7 +154,7 @@ export function PrintView() {
               ) })}
             </tbody>
           </table>
-          <footer className="sheet-foot">Cijene: 100 cm {f2(settings.pL)} €, 33 cm {f2(settings.pS)} €. Fuga {f1(settings.gap)} cm. Mjerilo crteža {settings.spx} px = {settings.scm} cm.</footer>
+          <footer className="sheet-foot"><b>Obrub</b> · Cijene: 100 cm {f2(settings.pL)} €, 33 cm {f2(settings.pS)} €. Fuga {f1(settings.gap)} cm. Mjerilo crteža {settings.spx} px = {settings.scm} cm.</footer>
         </section>
 
         {detailed && items.map((it, n) => {

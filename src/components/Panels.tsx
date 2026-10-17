@@ -80,6 +80,7 @@ export function MainMenu() {
   return (
     <div className="menu-wrap">
       <button type="button" className="icon-btn" aria-label="Izbornik" aria-expanded={open} onClick={() => setOpen(!open)}><Icon name="menu" /></button>
+      <span className="brand">Obrub</span>
       <span className={`save save-${saveState}`} role="status">{status}</span>
       {open && (
         <>

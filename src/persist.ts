@@ -1,7 +1,8 @@
 import { pauseHistory, resumeHistory, useStore } from './store'
 import { DEFAULT_SETTINGS, type Plan, type Shape } from './types'
 
-const CACHE = 'dvoriste-plan'
+const CACHE = 'obrub-plan'
+const OLD_CACHE = 'dvoriste-plan' // name before the rename; still read once
 
 function normalize(raw: any): Plan {
   const shapes: Shape[] = (raw?.shapes ?? []).map((s: any) => ({
@@ -23,7 +24,7 @@ export async function loadPlan() {
     if (r.ok) { const j = await r.json(); if (j) { plan = normalize(j); rev = j.rev ?? 0 } }
   } catch { /* server unreachable: fall back to the browser copy */ }
   if (!plan) {
-    try { const c = localStorage.getItem(CACHE); if (c) plan = normalize(JSON.parse(c)) } catch { /* ignore */ }
+    try { const c = localStorage.getItem(CACHE) ?? localStorage.getItem(OLD_CACHE); if (c) plan = normalize(JSON.parse(c)) } catch { /* ignore */ }
     if (plan) useStore.getState().set({ saveState: 'offline' })
   }
   useStore.getState().load(plan ?? normalize(null))
@@ -89,7 +90,7 @@ export function exportJSON() {
   const blob = new Blob([JSON.stringify({ version: 1, settings, shapes, rulers, joins }, null, 2)], { type: 'application/json' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
-  a.download = `dvoriste-${new Date().toISOString().slice(0, 10)}.json`
+  a.download = `obrub-plan-${new Date().toISOString().slice(0, 10)}.json`
   a.click()
   URL.revokeObjectURL(a.href)
 }

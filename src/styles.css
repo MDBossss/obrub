@@ -277,3 +277,5 @@ button.measure-label:hover { background: #c93a3f; }
   .sheet { box-shadow: none; max-width: none; break-after: page; page-break-after: always; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
 }
+.brand { font: 700 18px/1 var(--display); letter-spacing: .02em; }
+@media (max-width: 720px) { .brand { display: none; } }
