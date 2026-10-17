@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "settings": {
+    "spx": 214,
+    "scm": 650,
+    "gap": 1,
+    "pL": 6.6,
+    "pS": 2.39
+  },
+  "shapes": [
+    {
+      "id": "u-oblik",
+      "name": "U dio",
+      "kind": "asfalt",
+      "wpx": 388,
+      "hpx": 180,
+      "r": {
+        "tl": 0,
+        "tr": 0,
+        "br": 90,
+        "bl": 90
+      },
+      "sides": {
+        "t": false,
+        "r": true,
+        "b": true,
+        "l": true
+      },
+      "mode": "mix",
+      "x": -85,
+      "y": -90,
+      "rot": 0
+    },
+    {
+      "id": "smvcb0r22c2p5",
+      "name": "Trava ulaz",
+      "kind": "trava",
+      "wpx": 269,
+      "hpx": 251,
+      "r": {
+        "tl": 175,
+        "tr": 0,
+        "br": 0,
+        "bl": 0
+      },
+      "sides": {
+        "t": true,
+        "r": false,
+        "b": false,
+        "l": true
+      },
+      "mode": "mix",
+      "x": -135,
+      "y": 950,
+      "rot": 0
+    }
+  ]
+}

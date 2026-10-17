@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <style>
+      .cls-1 { fill: #45484b; }
+      .cls-2 { fill: #7fa65a; }
+    </style>
+  </defs>
+  <path id="Asfalt_prilaz" data-name="Asfalt prilaz" class="cls-1" d="M100,100H488V190c0,49.7-40.3,90-90,90H190c-49.7,0-90-40.3-90-90Z"/>
+  <path id="Trava_nepravilna" data-name="Trava nepravilna" class="cls-2" d="M560,120l300,-20c40,120 60,220 -10,330c-60,40-150,50-230,20Z"/>
+  <path data-name="Prebacaj" class="cls-2" d="M900,500V896H978V698C978.5,725 975,700 960,640C940,580 910,520 900,500Z"/>
+  <g transform="translate(150 450)">
+    <polygon data-name="Trokut" class="cls-2" points="0,0 260,40 120,240"/>
+  </g>
+</svg>
