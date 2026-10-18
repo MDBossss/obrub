@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { temporal } from 'zundo'
 import { DEFAULT_SETTINGS, type Join, type Plan, type Ruler, type Settings, type Shape } from './types'
+import { readLang, t, type Lang } from './i18n'
 
 export type Tool = 'select' | 'hand' | 'ruler' | 'cut'
 export interface View { x: number; y: number; zoom: number } // zoom = screen px per cm
@@ -28,6 +29,7 @@ interface State {
   snapHint: { p: [number, number]; kind: 'point' | 'edge' } | null
   pasteOpen: boolean
   printOpen: boolean
+  lang: Lang // UI language; not part of the plan or its history
   load: (p: Plan) => void
   addShape: (s: Shape) => void
   addRuler: (r: Ruler) => void
@@ -73,6 +75,7 @@ export const useStore = create<State>()(
       snapHint: null,
       pasteOpen: false,
       printOpen: false,
+      lang: readLang(),
       load: (p) => set({ shapes: p.shapes, rulers: p.rulers ?? [], joins: p.joins ?? [], settings: { ...DEFAULT_SETTINGS, ...p.settings }, loaded: true }),
       toggleSelect: (id) => {
         const sel = get().selection.includes(id) ? get().selection.filter((x) => x !== id) : [...get().selection, id]
@@ -83,7 +86,7 @@ export const useStore = create<State>()(
         // a shape belongs to at most one join: merging takes over any joins they were already in
         const old = get().joins.filter((j) => j.members.some((m) => ids.includes(m)))
         const members = [...new Set([...ids, ...old.flatMap((j) => j.members)])]
-        const j: Join = { id: newId(), name: `Spoj ${get().joins.length + 1}`, members, mode: old[0]?.mode ?? get().shapes.find((s) => s.id === ids[0])?.mode ?? 'mix' }
+        const j: Join = { id: newId(), name: t('Spoj {n}', { n: get().joins.length + 1 }), members, mode: old[0]?.mode ?? get().shapes.find((s) => s.id === ids[0])?.mode ?? 'mix' }
         set({ joins: [...get().joins.filter((x) => !old.includes(x)), j] })
       },
       updateJoin: (id, patch) => set({ joins: get().joins.map((j) => (j.id === id ? { ...j, ...patch } : j)) }),
@@ -103,7 +106,7 @@ export const useStore = create<State>()(
       duplicateShape: (id) => {
         const s = get().shapes.find((x) => x.id === id)
         if (!s) return
-        const c: Shape = { ...structuredClone(s), id: newId(), name: s.name + ' (kopija)', x: s.x + 100, y: s.y + 100 }
+        const c: Shape = { ...structuredClone(s), id: newId(), name: t('{name} (kopija)', { name: s.name }), x: s.x + 100, y: s.y + 100 }
         set({ shapes: [...get().shapes, c], selected: c.id, selection: [c.id] })
       },
       setSettings: (patch) => set({ settings: { ...get().settings, ...patch } }),

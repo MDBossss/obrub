@@ -1,114 +1,115 @@
 <div align="center">
   <img src="docs/logo.svg" width="72" alt="Obrub">
   <h1>Obrub</h1>
-  <p><strong>Planer betonskih rubnjaka za dvorište.</strong><br>
-  Nacrtaj ili uvezi dijelove dvorišta, označi gdje idu rubnjaci, i dobij točno koliko komada treba, gdje se reže i koliko to košta.</p>
+  <p><strong>A curb planner for yards and driveways.</strong><br>
+  Draw or import the parts of your yard, mark where the concrete curbs go, and get the exact number of pieces, where to cut them and what it costs.</p>
   <p>
-    <a href="#pokretanje">Pokretanje</a> ·
-    <a href="#što-zna">Što zna</a> ·
-    <a href="#kako-se-računa">Kako se računa</a> ·
-    <a href="#prečaci">Prečaci</a>
+    <a href="#getting-started">Getting started</a> ·
+    <a href="#features">Features</a> ·
+    <a href="#how-the-layout-works">How the layout works</a> ·
+    <a href="#keyboard-shortcuts">Shortcuts</a>
   </p>
 </div>
 
-![Obrub: cijelo dvorište s odabranim dijelom spoja](docs/hero.png)
+![Obrub showing a whole yard with one part of a join selected](docs/hero.png)
 
-## Pokretanje
+## Getting started
 
 ```sh
 pnpm install
-pnpm dev          # http://localhost:6123, i na lokalnoj mreži za mobitel
+pnpm dev          # http://localhost:6123, also on your local network for a phone
 ```
 
-Plan se sprema automatski u [`data/plan.json`](data/plan.json). Datoteka je u repozitoriju, pa je plan dostupan s bilo kojeg računala.
+The plan saves itself to [`data/plan.json`](data/plan.json). The file is committed, so the plan travels with the repository. The interface is in English or Croatian; switch it from the menu or in Settings.
 
-## Što zna
+## Features
 
 <table>
 <tr>
-<td width="50%"><img src="docs/outline.png" alt="Uvezeni obris s numeriranim rubovima"></td>
+<td width="50%"><img src="docs/outline.png" alt="An imported outline with numbered edges"></td>
 <td>
 
-### Nepravilni oblici iz Photoshopa
-Shape sloj izvezi kao SVG (*Export As → SVG* ili *Copy SVG*) i povuci ga na platno, ili samo zalijepi kod s <kbd>⌘V</kbd>. Svaki obris postaje oblik, podijeljen na rubove na kutovima i na prijelazima iz ravnog u luk. Klikom na rub uključuješ ili isključuješ rubnjak, a rub bez rubnjaka je crtkan.
+### Irregular shapes from Photoshop
+Export a shape layer as SVG (*Export As → SVG* or *Copy SVG*) and drop it on the canvas, or just paste the code with <kbd>⌘V</kbd>. Every outline becomes a shape, split into edges at corners and where a straight run turns into an arc. Click an edge to add or remove its curb; edges without a curb are dashed.
 
-Pravokutnici s radijusima kutova mogu se i ručno upisati, u pikselima s crteža ili u centimetrima.
+Rectangles with rounded corners can also be typed in, in drawing pixels or in centimetres.
 
 </td>
 </tr>
 <tr>
 <td>
 
-### Spajanje, nož i ljepljivi rubovi
-Dijelovi se dok ih povlačiš lijepe jedan uz drugi. Odabrane dijelove (<kbd>Shift</kbd> + klik) spojiš u jedan obris: rubnjaci tada idu samo vanjskim rubom, bez dvostrukih komada na dodiru. Nožem (<kbd>K</kbd>) presiječeš višak oblika.
+### Joins, knife and magnetic edges
+Shapes stick to each other while you drag them. Join selected shapes (<kbd>Shift</kbd> + click) into one outline: curbs then run only along the outside, with no doubled pieces where the parts meet. The knife (<kbd>K</kbd>) cuts away the part of a shape you don't need.
 
 </td>
-<td width="50%"><img src="docs/measure.png" alt="Ravnalo i udaljenost između dvaju dijelova"></td>
+<td width="50%"><img src="docs/measure.png" alt="Ruler and the gap between two parts"></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/materials.png" alt="Popis materijala za cijelo dvorište"></td>
+<td width="50%"><img src="docs/materials.png" alt="Material list for the whole yard"></td>
 <td>
 
-### Mjerenje i popis materijala
-Ravnalo (<kbd>M</kbd>) se lijepi na kutove, rubove i vanjske rubove rubnjaka. Udaljenost između dva dijela (<kbd>⌥</kbd> + klik) upišeš u centimetrima i dio se pomakne na tu udaljenost. Popis materijala zbraja sve dijelove i daje popis za kupnju s rezervom.
+### Measuring and the material list
+The ruler (<kbd>M</kbd>) snaps to corners, edges and the outer face of the curbs. Type the gap between two parts (<kbd>⌥</kbd> + click) in centimetres and the selected part moves to match. The material list adds everything up and gives you a shopping list with a reserve.
 
 </td>
 </tr>
 <tr>
 <td>
 
-### Ispis na A4
-Prva stranica je cijelo dvorište, ukupna količina i tablica po dijelovima. Uz *Detaljniji izvoz* svaki dio dobiva svoju stranicu s većim crtežom, brojevima rubova i redoslijedom komada po rubu, npr. `2×100 + rez 75,1 + 3×100 + 33`.
+### A4 print
+Page one shows the whole yard, the totals and a table per part. With *Detailed export*, every part gets its own page with a larger drawing, numbered edges and the order of pieces along each edge, for example `2×100 + cut 75.1 + 3×100 + 33`.
 
 </td>
-<td width="50%"><img src="docs/print.png" alt="Prva stranica ispisa"></td>
+<td width="50%"><img src="docs/print.png" alt="The first page of the printout"></td>
 </tr>
 </table>
 
 <details>
-<summary>Detaljna stranica ispisa i izgled na mobitelu</summary>
+<summary>Detailed print page and the phone layout</summary>
 <br>
 <p align="center">
-  <img src="docs/print-detail.png" width="48%" alt="Stranica za jedan dio">
+  <img src="docs/print-detail.png" width="48%" alt="A print page for one part">
   &nbsp;
-  <img src="docs/mobile.png" width="28%" alt="Obrub na mobitelu">
+  <img src="docs/mobile.png" width="28%" alt="Obrub on a phone">
 </p>
 </details>
 
-## Kako se računa
+## How the layout works
 
-Rubnjaci su 9×20×100 i 9×20×33 cm, s fugom od 1 cm. Cijene, fuga i mjerilo crteža (npr. 214 px = 650 cm) mijenjaju se u postavkama.
+Curbs are 9×20×100 and 9×20×33 cm with a 1 cm joint. Prices, the joint and the drawing scale (e.g. 214 px = 650 cm) are in Settings.
 
-- **Ravni rub između dva kuta:** što manje komada, najviše jedan rez, a rezani komad ide u sredinu.
-- **Rub sa slobodnim krajem:** cijeli komadi od vezanog kraja, a ostatak ide kao jedan odrezani komad na slobodni kraj.
-- **Luk:** komadi od 33 cm, a od 100 cm samo gdje bi od pravog luka odstupali manje od 1 cm. Radijus zaobljenog kuta prilagodi se tako da stanu cijeli komadi. Za svaki luk se vidi koliko odstupa i kolika je vanjska fuga.
-- **Kutovi koji nisu 90°:** kosi rez na oba komada, s kutom u tablici.
-- **Tri načina:** 100 + 33 cm, samo 100 cm, ili 100 cm prerezani na pola za lukove.
+- **A straight edge between two corners:** the fewest pieces with at most one cut, and the cut piece goes in the middle.
+- **An edge with a free end:** whole pieces from the fixed end, and whatever is left becomes one cut piece at the free end.
+- **Arcs:** 33 cm pieces, and 100 cm pieces only where they stay within 1 cm of the true curve. A rounded corner's radius is adjusted so that whole pieces fit. Each arc shows its deviation and the outer joint width.
+- **Corners other than 90°:** a mitre cut on both pieces, with the angle in the table.
+- **Three modes:** 100 + 33 cm, 100 cm only, or 100 cm pieces cut in half for arcs.
 
-## Prečaci
+## Keyboard shortcuts
 
-| Tipka | Radnja | Tipka | Radnja |
+| Key | Action | Key | Action |
 |---|---|---|---|
-| <kbd>V</kbd> | Odabir | <kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> | Poništi / ponovi |
-| <kbd>H</kbd> ili razmaknica | Pomicanje pogleda | <kbd>⌘D</kbd> | Dupliciraj |
-| <kbd>M</kbd> | Ravnalo | <kbd>R</kbd> / <kbd>⇧R</kbd> | Rotiraj 90° |
-| <kbd>K</kbd> | Nož | Strelice | Pomakni 1 cm (s <kbd>⇧</kbd> 10 cm) |
-| <kbd>N</kbd> | Novi oblik | <kbd>⇧1</kbd> / <kbd>⇧2</kbd> | Prikaži sve / odabrano |
-| <kbd>⌘P</kbd> | Ispis | <kbd>?</kbd> | Svi prečaci |
+| <kbd>V</kbd> | Select | <kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> | Undo / redo |
+| <kbd>H</kbd> or space | Pan | <kbd>⌘D</kbd> | Duplicate |
+| <kbd>M</kbd> | Ruler | <kbd>R</kbd> / <kbd>⇧R</kbd> | Rotate 90° |
+| <kbd>K</kbd> | Knife | Arrows | Nudge 1 cm (10 cm with <kbd>⇧</kbd>) |
+| <kbd>N</kbd> | New shape | <kbd>⇧1</kbd> / <kbd>⇧2</kbd> | Zoom to all / selection |
+| <kbd>⌘P</kbd> | Print | <kbd>?</kbd> | All shortcuts |
 
-## Razvoj
+## Development
 
-React, TypeScript, Vite i SVG platno, bez backenda: plan sprema mali middleware u [`vite.config.ts`](vite.config.ts). Svako spremanje ima broj verzije, pa dva otvorena prozora (npr. računalo i mobitel) ne prepisuju jedan drugoga.
+React, TypeScript, Vite and an SVG canvas, with no backend: a small middleware in [`vite.config.ts`](vite.config.ts) stores the plan. Every save carries a revision number, so two open windows (say a laptop and a phone) never overwrite each other.
 
 ```sh
 pnpm typecheck
-pnpm e2e          # pokreće vlastiti server na :6124 s testnim planom; tvoj plan ne dira
+pnpm e2e          # starts its own server on :6124 with a test plan; your plan is untouched
 ```
 
-| Mapa | Sadržaj |
+| Path | What it holds |
 |---|---|
-| `src/geometry.ts` | Raspored komada po rubovima, lukovi, kosi rezovi |
-| `src/svgImport.ts` | Čitanje SVG obrisa i podjela na rubove |
-| `src/join.ts`, `src/cut.ts` | Spajanje dijelova i nož |
-| `src/components/` | Platno, paneli, ispis |
-| `e2e/smoke.mjs` | Test u stvarnom pregledniku za sve gore |
+| `src/geometry.ts` | Piece layout along edges, arcs, mitre cuts |
+| `src/svgImport.ts` | Reading SVG outlines and splitting them into edges |
+| `src/join.ts`, `src/cut.ts` | Joining parts and the knife |
+| `src/i18n.ts` | English and Croatian text |
+| `src/components/` | Canvas, panels, print view |
+| `e2e/smoke.mjs` | Browser test covering all of the above |

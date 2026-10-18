@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { f1, gaps, layout, outerBounds, type Box } from '../geometry'
 import { useStore } from '../store'
+import { t } from '../i18n'
 
 export type Axis = 'x' | 'y'
 
@@ -81,7 +82,7 @@ export function MeasureLabels() {
   const editable = !hover || hover === pinned
   if (!segs.length) {
     const p = toScreen((boxes.a.x0 + boxes.a.x1) / 2, boxes.a.y0)
-    return <div className="measure-label static" style={p}>preklapaju se</div>
+    return <div className="measure-label static" style={p}>{t('preklapaju se')}</div>
   }
   return (
     <>
@@ -96,7 +97,7 @@ export function MeasureLabels() {
 function GapLabel({ seg, pos, editable, onCommit }: { seg: Seg; pos: { left: number; top: number }; editable: boolean; onCommit: (v: number) => void }) {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
-  const name = seg.axis === 'x' ? 'Vodoravna udaljenost' : 'Okomita udaljenost'
+  const name = t(seg.axis === 'x' ? 'Vodoravna udaljenost' : 'Okomita udaljenost')
   if (!editable) return <div className="measure-label static" style={pos}>{f1(seg.gap)} cm</div>
   if (editing) {
     const commit = () => {
@@ -105,13 +106,13 @@ function GapLabel({ seg, pos, editable, onCommit }: { seg: Seg; pos: { left: num
       setEditing(false)
     }
     return (
-      <input className="measure-label measure-input" style={pos} autoFocus aria-label={`${name} u cm`} inputMode="decimal" value={text}
+      <input className="measure-label measure-input" style={pos} autoFocus aria-label={t('{name} u cm', { name })} inputMode="decimal" value={text}
         onChange={(e) => setText(e.target.value)} onBlur={commit}
         onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false) }} />
     )
   }
   return (
-    <button type="button" className="measure-label" style={pos} title={`${name}: klikni i upiši cm`}
+    <button type="button" className="measure-label" style={pos} title={t('{name}: klikni i upiši cm', { name })}
       onClick={() => { setText(String(+seg.gap.toFixed(1))); setEditing(true) }}>
       {f1(seg.gap)} cm
     </button>

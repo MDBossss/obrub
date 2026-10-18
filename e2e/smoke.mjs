@@ -24,6 +24,8 @@ const watch = (page) => {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()) })
 }
 const state = (page) => page.evaluate(() => { const s = window.__obrub.getState(); return { shapes: s.shapes, selected: s.selected, view: s.view, saveState: s.saveState } })
+// the assertions below read Croatian UI text; English is checked separately at the end
+const croatian = (page) => page.addInitScript(() => localStorage.setItem('obrub-lang', 'hr'))
 const shapeCenter = (page, id) => page.evaluate((id) => {
   const r = document.querySelector(`[data-shape="${id}"] path`).getBoundingClientRect()
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
@@ -32,6 +34,7 @@ const shapeCenter = (page, id) => page.evaluate((id) => {
 try {
   // ---------- desktop ----------
   const page = await browser.newPage({ viewport: { width: 1400, height: 900 } })
+  await croatian(page)
   watch(page)
   await page.goto(APP_URL)
   await page.waitForFunction(() => window.__obrub.getState().loaded && document.querySelectorAll('[data-shape]').length > 0)
@@ -43,6 +46,7 @@ try {
 
   // rename is saved once and shows up in a second window of the same plan
   const other = await browser.newPage({ viewport: { width: 1000, height: 700 } })
+  await croatian(other)
   watch(other)
   await other.goto(APP_URL)
   await other.waitForFunction(() => window.__obrub.getState().loaded)
@@ -251,6 +255,7 @@ try {
   // ---------- phone ----------
   await writeFile(PLAN, original)
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 })
+  await croatian(phone)
   watch(phone)
   await phone.goto(APP_URL)
   await phone.waitForFunction(() => window.__obrub.getState().loaded && document.querySelectorAll('[data-shape]').length > 0)
@@ -264,6 +269,19 @@ try {
   const overflow = await phone.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
   assert.equal(overflow, false, 'no horizontal overflow on phone')
   await phone.close()
+
+  // ---------- English ----------
+  const en = await browser.newPage({ viewport: { width: 1400, height: 900 } })
+  await en.addInitScript(() => localStorage.setItem('obrub-lang', 'en'))
+  watch(en)
+  await en.goto(APP_URL)
+  await en.waitForFunction(() => window.__obrub.getState().loaded && document.querySelectorAll('[data-shape]').length > 0)
+  assert.equal(await en.evaluate(() => document.documentElement.lang), 'en', 'html lang follows the language')
+  await en.locator('.toolbar .tool-label', { hasText: 'New shape' }).waitFor()
+  await en.evaluate(() => window.__obrub.getState().set({ printOpen: true }))
+  await en.locator('.sheet-head h1', { hasText: 'Yard plan: curbs' }).waitFor()
+  await en.screenshot({ path: `${SHOTS}/obrub-english-print.png` })
+  await en.close()
 
   assert.deepEqual(errors, [], 'no console errors')
   console.log('smoke ok')

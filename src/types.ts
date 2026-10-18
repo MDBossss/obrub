@@ -34,6 +34,7 @@ export interface Plan { version: 1; settings: Settings; shapes: Shape[]; rulers?
 
 export const DEFAULT_SETTINGS: Settings = { spx: 214, scm: 650, gap: 1, pL: 6.6, pS: 2.39 }
 
+// Croatian labels; pass them through t() where they are shown
 export const MODES: Record<Mode, string> = {
   mix: '100 + 33 cm',
   long: 'Samo 100 cm',

@@ -1,6 +1,7 @@
 import { f1 } from '../geometry'
 import { useStore } from '../store'
 import { Icon } from './Icon'
+import { t } from '../i18n'
 
 type P = [number, number]
 const len = (a: P, b: P) => Math.hypot(b[0] - a[0], b[1] - a[1])
@@ -51,7 +52,7 @@ export function RulerLabels() {
         return (
           <div key={r.id} className="ruler-label" style={pos(r.a, r.b)}>
             <span><b>{l.main}</b>{l.parts && <small>{l.parts}</small>}</span>
-            <button type="button" aria-label="Obriši mjerenje" title="Obriši mjerenje" onClick={() => useStore.getState().removeRuler(r.id)}><Icon name="close" /></button>
+            <button type="button" aria-label={t('Obriši mjerenje')} title={t('Obriši mjerenje')} onClick={() => useStore.getState().removeRuler(r.id)}><Icon name="close" /></button>
           </div>
         )
       })}

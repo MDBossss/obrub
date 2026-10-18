@@ -8,6 +8,7 @@ import { importSvgFile, toggleEdge } from '../importSvg'
 import { MeasureLines } from './Measure'
 import { pauseHistory, resumeHistory, useStore, type View } from '../store'
 import type { Join, Shape } from '../types'
+import { t } from '../i18n'
 
 const MIN_ZOOM = 0.02, MAX_ZOOM = 8
 const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z))
@@ -269,7 +270,7 @@ export function Canvas({ spaceDown }: { spaceDown: boolean }) {
         if (f) useStore.getState().set({ toast: await importSvgFile(f) })
       }}
       role="application"
-      aria-label="Plan dvorišta"
+      aria-label={t('Plan dvorišta')}
     >
       <defs>
         <pattern id="grid" width={gridStep} height={gridStep} patternUnits="userSpaceOnUse">
@@ -302,7 +303,7 @@ function JoinView({ j, lay, zoom, active }: { j: Join; lay: JoinLayout; zoom: nu
       {active && lay.edges.map((e, i) => (
         <g key={'h' + i}>
           <path d={e.d} className={`edge-hit ${e.curbed ? 'on' : ''}`} data-join={j.id} data-join-edge={i} strokeWidth={14 / zoom}>
-            <title>{e.curbed ? 'Klikni: makni rubnjak s ovog ruba spoja' : 'Klikni: dodaj rubnjak na ovaj rub spoja'}</title>
+            <title>{t(e.curbed ? 'Klikni: makni rubnjak s ovog ruba spoja' : 'Klikni: dodaj rubnjak na ovaj rub spoja')}</title>
           </path>
           <g transform={`translate(${e.mid[0]} ${e.mid[1]})`} pointerEvents="none">
             <circle r={9 / zoom} className={`edge-badge ${e.curbed ? 'on' : ''}`} />
@@ -328,7 +329,7 @@ function ShapeView({ sh, lay, selected, primary, joined, zoom, grabbable }: { sh
         <>
           {!joined && lay.edges.map((e, i) => e.toggle === null ? null : (
             <path key={'h' + i} d={e.d} className={`edge-hit ${e.curbed ? 'on' : ''}`} data-edge={e.toggle} strokeWidth={14 / zoom}>
-              <title>{e.curbed ? 'Klikni: makni rubnjak s ovog ruba' : 'Klikni: dodaj rubnjak na ovaj rub'}</title>
+              <title>{t(e.curbed ? 'Klikni: makni rubnjak s ovog ruba' : 'Klikni: dodaj rubnjak na ovaj rub')}</title>
             </path>
           ))}
           {sh.path && !joined && lay.edges.map((e, i) => (

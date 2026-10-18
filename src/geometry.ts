@@ -1,3 +1,4 @@
+import { getLang, t } from './i18n'
 import type { Mode, Settings, Shape } from './types'
 
 export const L = 100
@@ -19,9 +20,14 @@ export interface Layout {
 const SIDE_NAMES = ['Gore', 'Desno', 'Dolje', 'Lijevo']
 const CORNER_NAMES = ['Kut gore desno', 'Kut dolje desno', 'Kut dolje lijevo', 'Kut gore lijevo']
 
-export const f1 = (x: number) => x.toFixed(1).replace('.', ',')
-export const f2 = (x: number) => x.toFixed(2).replace('.', ',')
+const dec = (s: string) => (getLang() === 'hr' ? s.replace('.', ',') : s)
+export const f1 = (x: number) => dec(x.toFixed(1))
+export const f2 = (x: number) => dec(x.toFixed(2))
 export const cmPerPx = (s: Settings) => s.scm / s.spx
+
+// Runs along a curved outline edge carry the edge's label plus this suffix
+export const arcSuffix = () => t(' (luk)')
+export const sameEdge = (runLabel: string, edgeLabel: string) => runLabel === edgeLabel || runLabel === edgeLabel + arcSuffix()
 
 // Radius that fits n pieces and n+1 joints exactly into a quarter circle (inner face)
 function arcRadius(n: number, g: number, len: number) {
@@ -114,7 +120,7 @@ export function layout(sh: Shape, st: Settings): Layout {
 
   for (let i = 0; i < 4; i++) {
     const D = defs[i]
-    if (D.len < -0.5) warns.push(`${SIDE_NAMES[i]}: radijusi su veći od stranice.`)
+    if (D.len < -0.5) warns.push(t('{side}: radijusi su veći od stranice.', { side: t(SIDE_NAMES[i]) }))
     if (sides[i] && D.len > 0) {
       const prev = corners[(i + 3) % 4], next = corners[i]
       const sFix = prev.curbed || prev.square, eFix = next.curbed || next.square
@@ -129,40 +135,40 @@ export function layout(sh: Shape, st: Settings): Layout {
         r = freeRun(len, g, S, allowS)
         let s = to
         for (const l of r.seq) { quad(P(s - l), P(s), D.nrm, l); s -= l + g }
-        note = 'Rezani i kratki komadi idu na slobodni početak.'
+        note = t('Rezani i kratki komadi idu na slobodni početak.')
       } else {
         r = freeRun(len, g, S, allowS)
         let s = from
         for (const l of r.seq) { quad(P(s), P(s + l), D.nrm, l); s += l + g }
-        if (sFix) note = 'Rezani i kratki komadi idu na slobodni kraj.'
+        if (sFix) note = t('Rezani i kratki komadi idu na slobodni kraj.')
       }
-      if (r.rest > 0.5) note += ` Ostaje ${f1(r.rest)} cm do kraja linije.`
-      runs.push({ label: SIDE_NAMES[i], len, seq: r.seq, S, note: note.trim() })
+      if (r.rest > 0.5) note += ' ' + t('Ostaje {n} cm do kraja linije.', { n: f1(r.rest) })
+      runs.push({ label: t(SIDE_NAMES[i]), len, seq: r.seq, S, note: note.trim() })
     }
     const c = corners[i]
     if (c.curbed) {
       const [cx, cy, a0] = centers[i], R = c.R, dt = 2 * Math.asin(arcLen / 2 / R)
-      let t = a0 + g / R
+      let th = a0 + g / R
       for (let m = 0; m < c.n; m++) {
-        const tm = t + dt / 2
-        quad([cx + R * Math.cos(t), cy + R * Math.sin(t)], [cx + R * Math.cos(t + dt), cy + R * Math.sin(t + dt)], [Math.cos(tm), Math.sin(tm)], arcLen)
-        t += dt + g / R
+        const tm = th + dt / 2
+        quad([cx + R * Math.cos(th), cy + R * Math.sin(th)], [cx + R * Math.cos(th + dt), cy + R * Math.sin(th + dt)], [Math.cos(tm), Math.sin(tm)], arcLen)
+        th += dt + g / R
       }
       const sag = (arcLen / 2) ** 2 / (2 * R), outer = g + B * (dt + g / R)
       runs.push({
-        label: CORNER_NAMES[i], len: Math.PI / 2 * R, seq: Array(c.n).fill(arcLen), S,
-        note: `R ${f2(R / 100)} m (crtež ${f2(c.R0 / 100)} m). Odstupanje od luka ${f1(sag)} cm, vanjska fuga ~${f1(outer)} cm.`,
+        label: t(CORNER_NAMES[i]), len: Math.PI / 2 * R, seq: Array(c.n).fill(arcLen), S,
+        note: t('R {r} m (crtež {r0} m). Odstupanje od luka {sag} cm, vanjska fuga ~{gap} cm.', { r: f2(R / 100), r0: f2(c.R0 / 100), sag: f1(sag), gap: f1(outer) }),
       })
     }
   }
   const edges: Edge[] = []
   for (let i = 0; i < 4; i++) {
     const D = defs[i]
-    if (D.len > 0) edges.push({ d: `M${D.o[0]} ${D.o[1]}L${D.o[0] + D.d[0] * D.len} ${D.o[1] + D.d[1] * D.len}`, curbed: sides[i], toggle: i, label: SIDE_NAMES[i], mid: [D.o[0] + D.d[0] * D.len / 2, D.o[1] + D.d[1] * D.len / 2], pts: [D.o, [D.o[0] + D.d[0] * D.len, D.o[1] + D.d[1] * D.len]] })
+    if (D.len > 0) edges.push({ d: `M${D.o[0]} ${D.o[1]}L${D.o[0] + D.d[0] * D.len} ${D.o[1] + D.d[1] * D.len}`, curbed: sides[i], toggle: i, label: t(SIDE_NAMES[i]), mid: [D.o[0] + D.d[0] * D.len / 2, D.o[1] + D.d[1] * D.len / 2], pts: [D.o, [D.o[0] + D.d[0] * D.len, D.o[1] + D.d[1] * D.len]] })
     const c = corners[i]
     if (c.R > 0) {
       const [cx, cy, a0] = centers[i], p0: Pt = [cx + c.R * Math.cos(a0), cy + c.R * Math.sin(a0)], p1: Pt = [cx + c.R * Math.cos(a0 + Math.PI / 2), cy + c.R * Math.sin(a0 + Math.PI / 2)]
-      edges.push({ d: `M${p0[0]} ${p0[1]}A${c.R} ${c.R} 0 0 1 ${p1[0]} ${p1[1]}`, curbed: c.curbed, toggle: null, label: CORNER_NAMES[i], mid: [cx + c.R * Math.cos(a0 + Math.PI / 4), cy + c.R * Math.sin(a0 + Math.PI / 4)],
+      edges.push({ d: `M${p0[0]} ${p0[1]}A${c.R} ${c.R} 0 0 1 ${p1[0]} ${p1[1]}`, curbed: c.curbed, toggle: null, label: t(CORNER_NAMES[i]), mid: [cx + c.R * Math.cos(a0 + Math.PI / 4), cy + c.R * Math.sin(a0 + Math.PI / 4)],
         pts: Array.from({ length: 9 }, (_, m): Pt => [cx + c.R * Math.cos(a0 + (Math.PI / 2) * (m / 8)), cy + c.R * Math.sin(a0 + (Math.PI / 2) * (m / 8))]) })
     }
   }
@@ -192,7 +198,7 @@ export function seqText(seq: number[], S: number) {
   while (i < seq.length) {
     let j = i
     while (j < seq.length && seq[j] === seq[i]) j++
-    const len = seq[i], name = len === L ? '100' : len === S ? (S === 33 ? '33' : '½') : `rez ${f1(len)}`
+    const len = seq[i], name = len === L ? '100' : len === S ? (S === 33 ? '33' : '½') : t('rez {n}', { n: f1(len) })
     parts.push((j - i > 1 ? `${j - i}×` : '') + name)
     i = j
   }
@@ -332,7 +338,7 @@ export function layoutRing(pts: Pt[], breaks: number[], edgeCurbs: boolean[], mo
   for (let e = 0; e < E; e++) {
     const ep = edgePts(e)
     const walk = new Walk(ep)
-    edges.push({ d: 'M' + ep.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L'), curbed: curbs[e], toggle: e, label: `Rub ${e + 1}`, mid: walk.at(walk.length / 2), pts: ep })
+    edges.push({ d: 'M' + ep.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L'), curbed: curbs[e], toggle: e, label: t('Rub {n}', { n: e + 1 }), mid: walk.at(walk.length / 2), pts: ep })
     perEdge.push([])
     if (!curbs[e]) continue
     const loop = E === 1
@@ -354,11 +360,11 @@ export function layoutRing(pts: Pt[], breaks: number[], edgeCurbs: boolean[], mo
         if (!sFix && eFix) {
           let s = len
           for (const l of r.seq) { list.unshift(quad(P(s - l), P(s), l)); s -= l + g }
-          note = 'Rezani i kratki komadi idu na slobodni početak.'
+          note = t('Rezani i kratki komadi idu na slobodni početak.')
         } else {
           let s = 0
           for (const l of r.seq) { list.push(quad(P(s), P(s + l), l)); s += l + g }
-          if (sFix) note = 'Rezani i kratki komadi idu na slobodni kraj.'
+          if (sFix) note = t('Rezani i kratki komadi idu na slobodni kraj.')
         }
       }
     } else {
@@ -386,16 +392,16 @@ export function layoutRing(pts: Pt[], breaks: number[], edgeCurbs: boolean[], mo
       if (reverse) {
         list.reverse(); seq.reverse()
         for (const pc of list) pc.pts = [pc.pts[1], pc.pts[0], pc.pts[3], pc.pts[2]]
-        note = 'Rezani komad ide na slobodni početak.'
+        note = t('Rezani komad ide na slobodni početak.')
       }
       // a chord laid backwards faces inward; flip each piece to the outward side of its own chord
       for (const pc of list) { const n = out([pc.pts[1][0] - pc.pts[0][0], pc.pts[1][1] - pc.pts[0][1]]); pc.pts[2] = [pc.pts[1][0] + B * n[0], pc.pts[1][1] + B * n[1]]; pc.pts[3] = [pc.pts[0][0] + B * n[0], pc.pts[0][1] + B * n[1]] }
-      note = `${note} Najveće odstupanje od luka ${f1(maxSag)} cm.`.trim()
+      note = `${note} ${t('Najveće odstupanje od luka {n} cm.', { n: f1(maxSag) })}`.trim()
     }
-    if (rest > 0.5) note += ` Ostaje ${f1(rest)} cm do kraja ruba.`
+    if (rest > 0.5) note += ' ' + t('Ostaje {n} cm do kraja ruba.', { n: f1(rest) })
     perEdge[e] = list
     pieces.push(...list)
-    runs.push({ label: `Rub ${e + 1}${straight ? '' : ' (luk)'}`, len: walk.length, seq, S, note: note.trim() })
+    runs.push({ label: edges[e].label + (straight ? '' : arcSuffix()), len: walk.length, seq, S, note: note.trim() })
   }
 
   // mitre the outer corners where two curbed edges meet at an angle
@@ -417,7 +423,7 @@ export function layoutRing(pts: Pt[], breaks: number[], edgeCurbs: boolean[], mo
     if (!x || d2(x, a.pts[1]) > 3 * B) continue
     a.pts[2] = x; b.pts[3] = x
     miters += 2
-    runs[runs.findIndex((r) => r.label.startsWith(`Rub ${e + 1}`))].note += ` Spoj s rubom ${((e + 1) % E) + 1}: kosi rez ${f1(turn / 2)}° na oba komada.`
+    runs[runs.findIndex((r) => sameEdge(r.label, edges[e].label))].note += ' ' + t('Spoj s rubom {n}: kosi rez {deg}° na oba komada.', { n: ((e + 1) % E) + 1, deg: f1(turn / 2) })
   }
   for (const r of runs) r.note = r.note.trim()
 
@@ -531,4 +537,4 @@ export function snap(geo: SnapGeo, p: Pt, tol: number): { p: Pt; kind: 'point' |
 }
 
 // Number of a run's edge as drawn on the plan (1-based), so tables and drawings line up
-export const runEdgeNo = (lay: Layout, label: string) => lay.edges.findIndex((e) => e.label === label.replace(' (luk)', '')) + 1
+export const runEdgeNo = (lay: Layout, label: string) => lay.edges.findIndex((e) => sameEdge(label, e.label)) + 1

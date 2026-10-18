@@ -11,6 +11,7 @@ import { NameField, NumField, Results, ShapeForm, ShapePreview } from './ShapeFo
 import { boxesFor, setGap } from './Measure'
 import { joinLayout, joinOf, type JoinLayout } from '../join'
 import { Icon } from './Icon'
+import { getLang, setLang, t } from '../i18n'
 
 export const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 export const mod = isMac ? '⌘' : 'Ctrl'
@@ -73,28 +74,29 @@ export function MainMenu() {
   const saveState = useStore((s) => s.saveState)
   const fileRef = useRef<HTMLInputElement>(null)
   const svgRef = useRef<HTMLInputElement>(null)
-  const status = { saved: 'Spremljeno', saving: 'Spremam…', error: 'Greška pri spremanju', offline: 'Spremljeno samo u pregledniku' }[saveState]
+  const status = t({ saved: 'Spremljeno', saving: 'Spremam…', error: 'Greška pri spremanju', offline: 'Spremljeno samo u pregledniku' }[saveState])
   const item = (label: string, fn: () => void, kbd?: string) => (
     <button type="button" role="menuitem" onClick={() => { setOpen(false); fn() }}>{label}{kbd && <kbd>{kbd}</kbd>}</button>
   )
   return (
     <div className="menu-wrap">
-      <button type="button" className="icon-btn" aria-label="Izbornik" aria-expanded={open} onClick={() => setOpen(!open)}><Icon name="menu" /></button>
+      <button type="button" className="icon-btn" aria-label={t('Izbornik')} aria-expanded={open} onClick={() => setOpen(!open)}><Icon name="menu" /></button>
       <span className="brand">Obrub</span>
       <span className={`save save-${saveState}`} role="status">{status}</span>
       {open && (
         <>
           <div className="scrim" onClick={() => setOpen(false)} />
           <div className="menu" role="menu">
-            {item('Novi oblik', () => useStore.getState().set({ builderOpen: true }), 'N')}
-            {item('Uvezi SVG iz Photoshopa', () => svgRef.current?.click())}
-            {item('Zalijepi SVG kod', () => useStore.getState().set({ pasteOpen: true }), `${mod}+V`)}
-            {item('Postavke i cijene', () => useStore.getState().set({ settingsOpen: true }))}
-            {item('Izvezi plan (.json)', exportJSON)}
-            {item('Otvori plan (.json)', () => fileRef.current?.click())}
-            {useStore.getState().rulers.length > 0 && item('Obriši sva mjerenja', () => useStore.getState().removeRuler(null))}
-            {item('Izvoz za ispis (PDF)', () => useStore.getState().set({ printOpen: true }), `${mod}+P`)}
-            {item('Prečaci', () => useStore.getState().set({ helpOpen: true }), '?')}
+            {item(t('Novi oblik'), () => useStore.getState().set({ builderOpen: true }), 'N')}
+            {item(t('Uvezi SVG iz Photoshopa'), () => svgRef.current?.click())}
+            {item(t('Zalijepi SVG kod'), () => useStore.getState().set({ pasteOpen: true }), `${mod}+V`)}
+            {item(t('Postavke i cijene'), () => useStore.getState().set({ settingsOpen: true }))}
+            {item(t('Izvezi plan (.json)'), exportJSON)}
+            {item(t('Otvori plan (.json)'), () => fileRef.current?.click())}
+            {useStore.getState().rulers.length > 0 && item(t('Obriši sva mjerenja'), () => useStore.getState().removeRuler(null))}
+            {item(t('Izvoz za ispis (PDF)'), () => useStore.getState().set({ printOpen: true }), `${mod}+P`)}
+            {item(t('Prečaci'), () => useStore.getState().set({ helpOpen: true }), '?')}
+            {item('English / Hrvatski', () => setLang(getLang() === 'en' ? 'hr' : 'en'))}
           </div>
         </>
       )}
@@ -111,14 +113,14 @@ export function Toolbar() {
   const set = useStore((s) => s.set)
   const snap = useStore((s) => s.snap)
   return (
-    <div className="toolbar" role="toolbar" aria-label="Alati">
-      <button type="button" className={`tool ${tool === 'select' ? 'on' : ''}`} aria-pressed={tool === 'select'} title="Odabir (V)" onClick={() => set({ tool: 'select' })}><Icon name="pointer" /><kbd>V</kbd></button>
-      <button type="button" className={`tool ${tool === 'hand' ? 'on' : ''}`} aria-pressed={tool === 'hand'} title="Pomicanje pogleda (H ili razmaknica)" onClick={() => set({ tool: 'hand' })}><Icon name="hand" /><kbd>H</kbd></button>
-      <button type="button" className={`tool ${tool === 'ruler' ? 'on' : ''}`} aria-pressed={tool === 'ruler'} title="Ravnalo (M): klik-klik ili povuci, Shift za 45°, Alt bez lijepljenja" onClick={() => set({ tool: 'ruler' })}><Icon name="ruler" /><kbd>M</kbd></button>
-      <button type="button" className={`tool ${tool === 'cut' ? 'on' : ''}`} aria-pressed={tool === 'cut'} title="Nož (K): povuci crtu preko cijelog oblika da ga prerežeš" onClick={() => set({ tool: 'cut' })}><Icon name="scissors" /><kbd>K</kbd></button>
-      <button type="button" className={`tool ${snap ? 'on' : ''}`} aria-pressed={snap} title={`Poravnanje na 10 cm (${mod}+')`} onClick={() => set({ snap: !snap })}><Icon name="grid" /></button>
+    <div className="toolbar" role="toolbar" aria-label={t('Alati')}>
+      <button type="button" className={`tool ${tool === 'select' ? 'on' : ''}`} aria-pressed={tool === 'select'} title={t('Odabir (V)')} onClick={() => set({ tool: 'select' })}><Icon name="pointer" /><kbd>V</kbd></button>
+      <button type="button" className={`tool ${tool === 'hand' ? 'on' : ''}`} aria-pressed={tool === 'hand'} title={t('Pomicanje pogleda (H ili razmaknica)')} onClick={() => set({ tool: 'hand' })}><Icon name="hand" /><kbd>H</kbd></button>
+      <button type="button" className={`tool ${tool === 'ruler' ? 'on' : ''}`} aria-pressed={tool === 'ruler'} title={t('Ravnalo (M): klik-klik ili povuci, Shift za 45°, Alt bez lijepljenja')} onClick={() => set({ tool: 'ruler' })}><Icon name="ruler" /><kbd>M</kbd></button>
+      <button type="button" className={`tool ${tool === 'cut' ? 'on' : ''}`} aria-pressed={tool === 'cut'} title={t('Nož (K): povuci crtu preko cijelog oblika da ga prerežeš')} onClick={() => set({ tool: 'cut' })}><Icon name="scissors" /><kbd>K</kbd></button>
+      <button type="button" className={`tool ${snap ? 'on' : ''}`} aria-pressed={snap} title={t('Poravnanje na 10 cm ({key})', { key: `${mod}+'` })} onClick={() => set({ snap: !snap })}><Icon name="grid" /></button>
       <span className="sep" />
-      <button type="button" className="tool primary" title="Novi oblik (N)" onClick={() => set({ builderOpen: true })}><Icon name="plus" /><span className="tool-label">Novi oblik</span></button>
+      <button type="button" className="tool primary" title={t('Novi oblik (N)')} onClick={() => set({ builderOpen: true })}><Icon name="plus" /><span className="tool-label">{t('Novi oblik')}</span></button>
     </div>
   )
 }
@@ -129,10 +131,10 @@ export function ZoomBar() {
   return (
     <div className="zoombar">
       <div className="group">
-        <button type="button" className="icon-btn" aria-label="Umanji" title={`Umanji (${mod}+−)`} onClick={() => zoomBy(1 / 1.25)}><Icon name="minus" /></button>
-        <button type="button" className="pct" aria-label="Vrati zum na 100 %" title={`100 % (${mod}+0)`} onClick={zoomReset}>{Math.round(zoom * 100)} %</button>
-        <button type="button" className="icon-btn" aria-label="Uvećaj" title={`Uvećaj (${mod}+=)`} onClick={() => zoomBy(1.25)}><Icon name="plus" /></button>
-        <button type="button" className="icon-btn" aria-label="Prikaži sve" title="Prikaži sve (Shift+1)" onClick={() => fitView()}><Icon name="fit" /></button>
+        <button type="button" className="icon-btn" aria-label={t('Umanji')} title={`${t('Umanji')} (${mod}+−)`} onClick={() => zoomBy(1 / 1.25)}><Icon name="minus" /></button>
+        <button type="button" className="pct" aria-label={t('Vrati zum na 100 %')} title={`100 % (${mod}+0)`} onClick={zoomReset}>{Math.round(zoom * 100)} %</button>
+        <button type="button" className="icon-btn" aria-label={t('Uvećaj')} title={`${t('Uvećaj')} (${mod}+=)`} onClick={() => zoomBy(1.25)}><Icon name="plus" /></button>
+        <button type="button" className="icon-btn" aria-label={t('Prikaži sve')} title={`${t('Prikaži sve')} (Shift+1)`} onClick={() => fitView()}><Icon name="fit" /></button>
       </div>
       <UndoGroup />
     </div>
@@ -144,8 +146,8 @@ function UndoGroup() {
   const futureLen = useStoreTemporal((t) => t.futureStates.length)
   return (
     <div className="group">
-      <button type="button" className="icon-btn" aria-label="Poništi" title={`Poništi (${mod}+Z)`} disabled={!pastLen} onClick={undo}><Icon name="undo" /></button>
-      <button type="button" className="icon-btn" aria-label="Ponovi" title={`Ponovi (${mod}+Shift+Z)`} disabled={!futureLen} onClick={redo}><Icon name="redo" /></button>
+      <button type="button" className="icon-btn" aria-label={t('Poništi')} title={`${t('Poništi')} (${mod}+Z)`} disabled={!pastLen} onClick={undo}><Icon name="undo" /></button>
+      <button type="button" className="icon-btn" aria-label={t('Ponovi')} title={`${t('Ponovi')} (${mod}+Shift+Z)`} disabled={!futureLen} onClick={redo}><Icon name="redo" /></button>
     </div>
   )
 }
@@ -163,31 +165,31 @@ export function Materials() {
   const select = useStore((s) => s.select)
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const t = useMemo(() => totals(shapes, settings, joins), [shapes, settings, joins])
+  const tot = useMemo(() => totals(shapes, settings, joins), [shapes, settings, joins])
   const items = useMemo(() => planItems(shapes, joins, settings), [shapes, joins, settings])
   if (!shapes.length) return null
   const list = [
-    `Rubnjak 100 cm: ${Math.ceil(t.buyL * 1.05)} kom (${t.buyL} + 5 % rezerve)`,
-    t.buyS ? `Rubnjak 33 cm: ${Math.ceil(t.buyS * 1.05)} kom (${t.buyS} + 5 % rezerve)` : '',
-    `Ukupno ${f1(t.len / 100)} m rubnjaka, oko ${f1(t.weight / 1000)} t, ${f2(t.cost)} € bez rezerve`,
+    t('Rubnjak 100 cm: {n} kom ({base} + 5 % rezerve)', { n: Math.ceil(tot.buyL * 1.05), base: tot.buyL }),
+    tot.buyS ? t('Rubnjak 33 cm: {n} kom ({base} + 5 % rezerve)', { n: Math.ceil(tot.buyS * 1.05), base: tot.buyS }) : '',
+    t('Ukupno {len} m rubnjaka, oko {weight} t, {cost} € bez rezerve', { len: f1(tot.len / 100), weight: f1(tot.weight / 1000), cost: f2(tot.cost) }),
   ].filter(Boolean).join('\n')
   return (
     <div className={`materials ${open ? 'open' : ''}`}>
       <button type="button" className="materials-pill" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <b>{t.buyL}{t.buyS ? ` + ${t.buyS}` : ''}</b> kom · <b>{f1(t.len / 100)} m</b> · <b>{f2(t.cost)} €</b>
+        <b>{tot.buyL}{tot.buyS ? ` + ${tot.buyS}` : ''}</b> {t('kom')} · <b>{f1(tot.len / 100)} m</b> · <b>{f2(tot.cost)} €</b>
         <Icon name={open ? 'chevron-up' : 'chevron-down'} />
       </button>
       {open && (
         <div className="panel materials-panel">
-          <h2>Cijelo dvorište</h2>
+          <h2>{t('Cijelo dvorište')}</h2>
           <div className="stats">
-            <div className="stat"><b>{t.buyL}{t.buyS ? ` + ${t.buyS}` : ''}</b><span>kom. 100{t.buyS ? ' + 33' : ''} cm{t.halving ? `, ${t.halving} na pola` : ''}</span></div>
-            <div className="stat"><b>{f2(t.cost)} €</b><span>bez rezerve</span></div>
-            <div className="stat"><b>{f1(t.len / 100)} m</b><span>rubnjaka</span></div>
-            <div className="stat"><b>{t.cuts}</b><span>rezova · {f1(t.weight / 1000)} t</span></div>
+            <div className="stat"><b>{tot.buyL}{tot.buyS ? ` + ${tot.buyS}` : ''}</b><span>{t(tot.buyS ? 'kom. 100 + 33 cm' : 'kom. 100 cm')}{tot.halving ? ', ' + t('{n} na pola', { n: tot.halving }) : ''}</span></div>
+            <div className="stat"><b>{f2(tot.cost)} €</b><span>{t('bez rezerve')}</span></div>
+            <div className="stat"><b>{f1(tot.len / 100)} m</b><span>{t('rubnjaka')}</span></div>
+            <div className="stat"><b>{tot.cuts}</b><span>{t('rezova')} · {f1(tot.weight / 1000)} t</span></div>
           </div>
           <table>
-            <thead><tr><th>Oblik</th><th>Rubnjak</th><th>Cijena</th></tr></thead>
+            <thead><tr><th>{t('Oblik')}</th><th>{t('Rubnjak')}</th><th>{t('Cijena')}</th></tr></thead>
             <tbody>
               {items.map((s) => (
                 <tr key={s.id} className="clickable" onClick={() => { select(s.first); fitView(s.first) }}>
@@ -198,11 +200,11 @@ export function Materials() {
               ))}
             </tbody>
           </table>
-          <h3>Popis za kupnju</h3>
+          <h3>{t('Popis za kupnju')}</h3>
           <pre className="shopping">{list}</pre>
           <button type="button" onClick={async () => {
             try { await navigator.clipboard.writeText(list); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { /* clipboard refused */ }
-          }}>{copied ? 'Kopirano' : 'Kopiraj popis'}</button>
+          }}>{t(copied ? 'Kopirano' : 'Kopiraj popis')}</button>
         </div>
       )}
     </div>
@@ -225,39 +227,39 @@ export function Inspector() {
   const jl = join ? joinLayout(join, shapesAll, settings) : null
   const lay: Layout = jl && !jl.error ? jl : layout(sh, settings)
   return (
-    <aside className={`panel inspector ${panelOpen ? 'expanded' : ''}`} aria-label="Svojstva oblika">
-      <button type="button" className="sheet-handle" aria-label={panelOpen ? 'Smanji panel' : 'Proširi panel'} onClick={() => st.set({ panelOpen: !panelOpen })}><span /></button>
+    <aside className={`panel inspector ${panelOpen ? 'expanded' : ''}`} aria-label={t('Svojstva oblika')}>
+      <button type="button" className="sheet-handle" aria-label={t(panelOpen ? 'Smanji panel' : 'Proširi panel')} onClick={() => st.set({ panelOpen: !panelOpen })}><span /></button>
       <div className="inspector-head">
-        <h2><i className={`swatch fill-${sh.kind}`} />{sh.name}{join && <small className="in-join">u spoju „{join.name}”</small>}</h2>
-        <button type="button" className="icon-btn" aria-label="Zatvori" title="Zatvori (Esc)" onClick={() => st.select(null)}><Icon name="close" /></button>
+        <h2><i className={`swatch fill-${sh.kind}`} />{sh.name}{join && <small className="in-join">{t('u spoju „{name}”', { name: join.name })}</small>}</h2>
+        <button type="button" className="icon-btn" aria-label={t('Zatvori')} title={`${t('Zatvori')} (Esc)`} onClick={() => st.select(null)}><Icon name="close" /></button>
       </div>
       <div className="inspector-summary">
-        <b>{lay.buyS ? `${lay.buyL} + ${lay.buyS}` : lay.buyL}</b> kom · <b>{f1(lay.length / 100)} m</b> · <b>{f2(lay.cost)} €</b>
+        <b>{lay.buyS ? `${lay.buyL} + ${lay.buyS}` : lay.buyL}</b> {t('kom')} · <b>{f1(lay.length / 100)} m</b> · <b>{f2(lay.cost)} €</b>
       </div>
       <div className="inspector-body">
         <ShapeForm idPrefix="i" sh={sh} settings={settings} onChange={(p) => st.updateShape(sh.id, p)} inJoin={!!join} />
         {join && <JoinSection join={join} lay={jl} />}
         <fieldset>
-          <legend>Položaj</legend>
+          <legend>{t('Položaj')}</legend>
           <div className="pair">
             <NumField id="i-x" label="X cm" digits={1} value={sh.x} onChange={(v) => st.moveShape(sh.id, v, sh.y)} allowNegative />
             <NumField id="i-y" label="Y cm" digits={1} value={sh.y} onChange={(v) => st.moveShape(sh.id, sh.x, v)} allowNegative />
           </div>
           <div className="row">
-            <button type="button" title="Rotiraj ulijevo (Shift+R)" onClick={() => st.updateShape(sh.id, { rot: ((sh.rot - 90) % 360 + 360) % 360 })}><Icon name="rotate-left" /> 90°</button>
-            <button type="button" title="Rotiraj udesno (R)" onClick={() => st.updateShape(sh.id, { rot: (sh.rot + 90) % 360 })}><Icon name="rotate-right" /> 90°</button>
+            <button type="button" title={t('Rotiraj ulijevo (Shift+R)')} onClick={() => st.updateShape(sh.id, { rot: ((sh.rot - 90) % 360 + 360) % 360 })}><Icon name="rotate-left" /> 90°</button>
+            <button type="button" title={t('Rotiraj udesno (R)')} onClick={() => st.updateShape(sh.id, { rot: (sh.rot + 90) % 360 })}><Icon name="rotate-right" /> 90°</button>
             <label className="num grow" htmlFor="i-rot"><span>°</span>
               <input id="i-rot" inputMode="decimal" value={sh.rot} onChange={(e) => { const v = parseFloat(e.target.value); if (Number.isFinite(v)) st.updateShape(sh.id, { rot: v }) }} />
             </label>
           </div>
         </fieldset>
         <Distance id={sh.id} />
-        {join && <h3>Rubnjaci za cijeli spoj</h3>}
+        {join && <h3>{t('Rubnjaci za cijeli spoj')}</h3>}
         <Results lay={lay} settings={settings} />
         <div className="row">
-          <button type="button" title={`Dupliciraj (${mod}+D)`} onClick={() => st.duplicateShape(sh.id)}><Icon name="copy" /> Dupliciraj</button>
-          <button type="button" className="danger" title="Obriši (Delete)" onClick={() => { if (armed) { st.removeShape(sh.id); setArmed(false) } else setArmed(true) }} onBlur={() => setArmed(false)}>
-            <Icon name="trash" /> {armed ? 'Sigurno obriši?' : 'Obriši'}
+          <button type="button" title={`${t('Dupliciraj')} (${mod}+D)`} onClick={() => st.duplicateShape(sh.id)}><Icon name="copy" /> {t('Dupliciraj')}</button>
+          <button type="button" className="danger" title={`${t('Obriši')} (Delete)`} onClick={() => { if (armed) { st.removeShape(sh.id); setArmed(false) } else setArmed(true) }} onBlur={() => setArmed(false)}>
+            <Icon name="trash" /> {t(armed ? 'Sigurno obriši?' : 'Obriši')}
           </button>
         </div>
       </div>
@@ -276,7 +278,7 @@ export function Builder() {
 function BuilderBody({ settings }: { settings: Settings }) {
   const st = useStore.getState()
   const [draft, setDraft] = useState<Shape>(() => ({
-    id: newId(), name: `Oblik ${st.shapes.length + 1}`, kind: 'asfalt', wpx: 200, hpx: 120,
+    id: newId(), name: t('Oblik {n}', { n: st.shapes.length + 1 }), kind: 'asfalt', wpx: 200, hpx: 120,
     r: { tl: 0, tr: 0, br: 0, bl: 0 }, sides: { t: true, r: true, b: true, l: true }, mode: 'mix', x: 0, y: 0, rot: 0,
   }))
   const lay = layout(draft, settings)
@@ -296,8 +298,8 @@ function BuilderBody({ settings }: { settings: Settings }) {
           <Results lay={lay} settings={settings} />
         </div>
         <div className="builder-form">
-          <div className="inspector-head"><h2 id="b-title">Novi oblik</h2>
-            <button type="button" className="icon-btn" aria-label="Zatvori" onClick={close}><Icon name="close" /></button></div>
+          <div className="inspector-head"><h2 id="b-title">{t('Novi oblik')}</h2>
+            <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={close}><Icon name="close" /></button></div>
           <label className="import-svg">
             <input type="file" accept="image/svg+xml,.svg" onChange={async (e) => {
               const f = e.target.files?.[0]
@@ -306,12 +308,12 @@ function BuilderBody({ settings }: { settings: Settings }) {
               useStore.getState().set({ toast: msg, builderOpen: false })
               requestAnimationFrame(() => fitView())
             }} />
-            <span>Nepravilan oblik? <b>Uvezi SVG iz Photoshopa</b></span>
+            <span>{t('Nepravilan oblik?')} <b>{t('Uvezi SVG iz Photoshopa')}</b></span>
           </label>
           <ShapeForm idPrefix="b" sh={draft} settings={settings} onChange={(p) => setDraft({ ...draft, ...p })} />
           <div className="row sticky-actions">
-            <button type="button" className="primary" onClick={add}>Dodaj na plan</button>
-            <button type="button" onClick={close}>Odustani</button>
+            <button type="button" className="primary" onClick={add}>{t('Dodaj na plan')}</button>
+            <button type="button" onClick={close}>{t('Odustani')}</button>
           </div>
         </div>
       </div>
@@ -322,6 +324,7 @@ function BuilderBody({ settings }: { settings: Settings }) {
 export function SettingsDialog() {
   const open = useStore((s) => s.settingsOpen)
   const settings = useStore((s) => s.settings)
+  const lang = useStore((s) => s.lang)
   if (!open) return null
   const st = useStore.getState()
   const close = () => st.set({ settingsOpen: false })
@@ -334,29 +337,36 @@ export function SettingsDialog() {
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) close() }} onKeyDown={(e) => { if (e.key === 'Escape') close() }}>
       <div className="dialog small" role="dialog" aria-modal="true" aria-labelledby="set-title">
-        <div className="inspector-head"><h2 id="set-title">Postavke i cijene</h2>
-          <button type="button" className="icon-btn" aria-label="Zatvori" onClick={close}><Icon name="close" /></button></div>
-        <fieldset><legend>Mjerilo crteža</legend>
+        <div className="inspector-head"><h2 id="set-title">{t('Postavke i cijene')}</h2>
+          <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={close}><Icon name="close" /></button></div>
+        <fieldset><legend>{t('Mjerilo crteža')}</legend>
           <div className="pair">{field('spx', 'px')}{field('scm', 'cm')}</div>
           <p className="hint">1 px = {f1(settings.scm / settings.spx)} cm</p>
         </fieldset>
-        <fieldset><legend>Ugradnja</legend>{field('gap', 'Fuga (cm)')}</fieldset>
-        <fieldset><legend>Cijene po komadu (€)</legend>
+        <fieldset><legend>{t('Ugradnja')}</legend>{field('gap', t('Fuga (cm)'))}</fieldset>
+        <fieldset><legend>{t('Cijene po komadu (€)')}</legend>
           <div className="pair">{field('pL', '100 cm')}{field('pS', '33 cm')}</div>
         </fieldset>
-        <div className="row"><button type="button" className="primary" onClick={close}>Gotovo</button></div>
+        <fieldset><legend>{t('Jezik')}</legend>
+          <div className="seg" role="radiogroup" aria-label={t('Jezik')}>
+            {(['en', 'hr'] as const).map((l) => (
+              <button key={l} type="button" role="radio" aria-checked={lang === l} className={lang === l ? 'on' : ''} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
+            ))}
+          </div>
+        </fieldset>
+        <div className="row"><button type="button" className="primary" onClick={close}>{t('Gotovo')}</button></div>
       </div>
     </div>
   )
 }
 
-const SHORTCUTS: [string, string][] = [
-  ['V', 'Odabir'], ['M', 'Ravnalo: klik-klik ili povuci (Shift: 45°, Alt: bez lijepljenja)'], ['K', 'Nož: crta preko cijelog oblika ga prereže'], ['H ili razmaknica + povlačenje', 'Pomicanje pogleda'], ['N', 'Novi oblik'],
-  [`${mod}+Z`, 'Poništi'], [`${mod}+Shift+Z`, 'Ponovi'], [`${mod}+D`, 'Dupliciraj'], ['Delete', 'Obriši'],
-  ['Strelice', 'Pomakni 1 cm (Shift: 10 cm)'], ['R / Shift+R', 'Rotiraj 90° udesno / ulijevo'],
-  [`${mod}+kotačić ili štipanje`, 'Zum'], ['Kotačić', 'Pomicanje pogleda'], [`${mod}+= / ${mod}+−`, 'Uvećaj / umanji'],
-  [`${mod}+0`, 'Zum 100 %'], ['Shift+1', 'Prikaži sve'], ['Shift+2', 'Prikaži odabrani'], [`${mod}+'`, 'Poravnanje na 10 cm'],
-  ['Alt + povlačenje', 'Pomicanje bez poravnanja'], ['Esc', 'Odznači / zatvori'], ['?', 'Prečaci'],
+const shortcuts = (): [string, string][] => [
+  ['V', t('Odabir')], ['M', t('Ravnalo: klik-klik ili povuci (Shift: 45°, Alt: bez lijepljenja)')], ['K', t('Nož: crta preko cijelog oblika ga prereže')], [t('H ili razmaknica + povlačenje'), t('Pomicanje pogleda')], ['N', t('Novi oblik')],
+  [`${mod}+Z`, t('Poništi')], [`${mod}+Shift+Z`, t('Ponovi')], [`${mod}+D`, t('Dupliciraj')], ['Delete', t('Obriši')],
+  [t('Strelice'), t('Pomakni 1 cm (Shift: 10 cm)')], ['R / Shift+R', t('Rotiraj 90° udesno / ulijevo')],
+  [t('{mod}+kotačić ili štipanje', { mod }), t('Zum')], [t('Kotačić'), t('Pomicanje pogleda')], [`${mod}+= / ${mod}+−`, t('Uvećaj / umanji')],
+  [`${mod}+0`, t('Zum 100 %')], ['Shift+1', t('Prikaži sve')], ['Shift+2', t('Prikaži odabrani')], [`${mod}+'`, t('Poravnanje na 10 cm')],
+  [t('Alt + povlačenje'), t('Pomicanje bez poravnanja')], ['Esc', t('Odznači / zatvori')], ['?', t('Prečaci')],
 ]
 export function HelpDialog() {
   const open = useStore((s) => s.helpOpen)
@@ -365,10 +375,10 @@ export function HelpDialog() {
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) close() }}>
       <div className="dialog small" role="dialog" aria-modal="true" aria-labelledby="help-title">
-        <div className="inspector-head"><h2 id="help-title">Prečaci</h2>
-          <button type="button" className="icon-btn" aria-label="Zatvori" onClick={close}><Icon name="close" /></button></div>
-        <table className="shortcuts"><tbody>{SHORTCUTS.map(([k, d]) => <tr key={k}><td><kbd>{k}</kbd></td><td>{d}</td></tr>)}</tbody></table>
-        <p className="hint">Na mobitelu: dva prsta za zum i pomicanje, dodir za odabir.</p>
+        <div className="inspector-head"><h2 id="help-title">{t('Prečaci')}</h2>
+          <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={close}><Icon name="close" /></button></div>
+        <table className="shortcuts"><tbody>{shortcuts().map(([k, d]) => <tr key={k}><td><kbd>{k}</kbd></td><td>{d}</td></tr>)}</tbody></table>
+        <p className="hint">{t('Na mobitelu: dva prsta za zum i pomicanje, dodir za odabir.')}</p>
       </div>
     </div>
   )
@@ -382,11 +392,11 @@ export function EmptyState() {
     <div className="empty">
       {loaded ? (
         <>
-          <h2>Plan je prazan</h2>
-          <p>Dodaj prvi dio dvorišta: upiši mjere s crteža, označi gdje idu rubnjaci, pa ga postavi na plan.</p>
-          <button type="button" className="primary" onClick={() => useStore.getState().set({ builderOpen: true })}><Icon name="plus" /> Novi oblik</button>
+          <h2>{t('Plan je prazan')}</h2>
+          <p>{t('Dodaj prvi dio dvorišta: upiši mjere s crteža, označi gdje idu rubnjaci, pa ga postavi na plan.')}</p>
+          <button type="button" className="primary" onClick={() => useStore.getState().set({ builderOpen: true })}><Icon name="plus" /> {t('Novi oblik')}</button>
         </>
-      ) : <p>Učitavam plan…</p>}
+      ) : <p>{t('Učitavam plan…')}</p>}
     </div>
   )
 }
@@ -402,21 +412,21 @@ function Distance({ id }: { id: string }) {
   const g = boxes ? gaps(boxes.a, boxes.b) : null
   return (
     <fieldset>
-      <legend>Udaljenost</legend>
+      <legend>{t('Udaljenost')}</legend>
       <label className="field" htmlFor="i-measure">
-        <span>Do oblika</span>
+        <span>{t('Do oblika')}</span>
         <select id="i-measure" value={target ?? ''} onChange={(e) => useStore.getState().set({ measureTo: e.target.value || null })}>
-          <option value="">Odaberi…</option>
+          <option value="">{t('Odaberi…')}</option>
           {others.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
         </select>
       </label>
       {g && (
         <div className="pair">
-          {g.gx ? <NumField id="i-gx" label="↔ cm" digits={1} value={g.gx.gap} onChange={(v) => setGap(id, target!, 'x', v)} /> : <p className="hint">↔ preklapaju se</p>}
-          {g.gy ? <NumField id="i-gy" label="↕ cm" digits={1} value={g.gy.gap} onChange={(v) => setGap(id, target!, 'y', v)} /> : <p className="hint">↕ preklapaju se</p>}
+          {g.gx ? <NumField id="i-gx" label="↔ cm" digits={1} value={g.gx.gap} onChange={(v) => setGap(id, target!, 'x', v)} /> : <p className="hint">↔ {t('preklapaju se')}</p>}
+          {g.gy ? <NumField id="i-gy" label="↕ cm" digits={1} value={g.gy.gap} onChange={(v) => setGap(id, target!, 'y', v)} /> : <p className="hint">↕ {t('preklapaju se')}</p>}
         </div>
       )}
-      <p className="hint">Mjeri se od vanjskog ruba, s rubnjakom. Na platnu: drži {isMac ? '⌥' : 'Alt'} i prijeđi mišem preko drugog oblika, {isMac ? '⌥' : 'Alt'}+klik ga zadrži, a klik na broj ga mijenja. Upisom se pomiče odabrani oblik.</p>
+      <p className="hint">{t('Mjeri se od vanjskog ruba, s rubnjakom. Na platnu: drži {alt} i prijeđi mišem preko drugog oblika, {alt}+klik ga zadrži, a klik na broj ga mijenja. Upisom se pomiče odabrani oblik.', { alt: isMac ? '⌥' : 'Alt' })}</p>
     </fieldset>
   )
 }
@@ -425,14 +435,14 @@ export function Toast() {
   const msg = useStore((s) => s.toast)
   useEffect(() => {
     if (!msg) return
-    const t = setTimeout(() => useStore.getState().set({ toast: null }), 7000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => useStore.getState().set({ toast: null }), 7000)
+    return () => clearTimeout(timer)
   }, [msg])
   if (!msg) return null
   return (
     <div className="toast" role="status">
       <span>{msg}</span>
-      <button type="button" className="icon-btn" aria-label="Zatvori" onClick={() => useStore.getState().set({ toast: null })}><Icon name="close" /></button>
+      <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={() => useStore.getState().set({ toast: null })}><Icon name="close" /></button>
     </div>
   )
 }
@@ -443,18 +453,18 @@ export function PasteDialog() {
   if (!open) return null
   const close = () => { setText(''); useStore.getState().set({ pasteOpen: false }) }
   const run = () => {
-    const msg = importSvgText(text, 'Zalijepljeno')
-    useStore.getState().set({ toast: msg })
-    if (msg.startsWith('Uvezeno')) { close(); requestAnimationFrame(() => fitView()) }
+    const r = importSvgText(text, t('Zalijepljeno'))
+    useStore.getState().set({ toast: r.message })
+    if (r.ok) { close(); requestAnimationFrame(() => fitView()) }
   }
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) close() }} onKeyDown={(e) => { if (e.key === 'Escape') close() }}>
       <div className="dialog small" role="dialog" aria-modal="true" aria-labelledby="paste-title">
-        <div className="inspector-head"><h2 id="paste-title">Zalijepi SVG kod</h2>
-          <button type="button" className="icon-btn" aria-label="Zatvori" onClick={close}><Icon name="close" /></button></div>
-        <p className="hint">U Photoshopu desni klik na sloj → Copy SVG, pa zalijepi ovdje. Na računalu možeš i samo pritisnuti {mod}+V na platnu.</p>
+        <div className="inspector-head"><h2 id="paste-title">{t('Zalijepi SVG kod')}</h2>
+          <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={close}><Icon name="close" /></button></div>
+        <p className="hint">{t('U Photoshopu desni klik na sloj → Copy SVG, pa zalijepi ovdje. Na računalu možeš i samo pritisnuti {key} na platnu.', { key: `${mod}+V` })}</p>
         <textarea id="paste-svg" className="paste-area" autoFocus value={text} onChange={(e) => setText(e.target.value)} placeholder="<svg …>…</svg>" spellCheck={false} />
-        <div className="row"><button type="button" className="primary" disabled={!text.trim()} onClick={run}>Uvezi</button><button type="button" onClick={close}>Odustani</button></div>
+        <div className="row"><button type="button" className="primary" disabled={!text.trim()} onClick={run}>{t('Uvezi')}</button><button type="button" onClick={close}>{t('Odustani')}</button></div>
       </div>
     </div>
   )
@@ -468,21 +478,21 @@ function MultiInspector({ ids }: { ids: string[] }) {
   const list = shapes.filter((s) => ids.includes(s.id))
   const already = joins.find((j) => ids.every((id) => j.members.includes(id)) && j.members.length === ids.length)
   return (
-    <aside className="panel inspector" aria-label="Odabrani oblici">
+    <aside className="panel inspector" aria-label={t('Odabrani oblici')}>
       <div className="inspector-head">
-        <h2>Odabrano: {list.length}</h2>
-        <button type="button" className="icon-btn" aria-label="Zatvori" title="Zatvori (Esc)" onClick={() => st.select(null)}><Icon name="close" /></button>
+        <h2>{t('Odabrano: {n}', { n: list.length })}</h2>
+        <button type="button" className="icon-btn" aria-label={t('Zatvori')} title={`${t('Zatvori')} (Esc)`} onClick={() => st.select(null)}><Icon name="close" /></button>
       </div>
       <ul className="sel-list">{list.map((s) => <li key={s.id}><i className={`swatch fill-${s.kind}`} />{s.name}</li>)}</ul>
       {already
-        ? <p className="hint">Ovi oblici su već spojeni ({already.name}).</p>
+        ? <p className="hint">{t('Ovi oblici su već spojeni ({name}).', { name: already.name })}</p>
         : <>
-          <button type="button" className="primary" onClick={() => { st.joinShapes(ids); st.set({ toast: 'Spojeno. Rubnjaci sad idu samo vanjskim rubom spoja.' }) }}>
-            Spoji u jedan obris
+          <button type="button" className="primary" onClick={() => { st.joinShapes(ids); st.set({ toast: t('Spojeno. Rubnjaci sad idu samo vanjskim rubom spoja.') }) }}>
+            {t('Spoji u jedan obris')}
           </button>
-          <p className="hint">Rubnjaci idu samo vanjskim rubom, a gdje se oblici dodiruju nema rubnjaka. Oblici se moraju dodirivati ili preklapati; kad ih povlačiš, rubovi se sami zalijepe.</p>
+          <p className="hint">{t('Rubnjaci idu samo vanjskim rubom, a gdje se oblici dodiruju nema rubnjaka. Oblici se moraju dodirivati ili preklapati; kad ih povlačiš, rubovi se sami zalijepe.')}</p>
         </>}
-      <p className="hint">Shift + klik dodaje ili makne oblik iz odabira. Povlačenjem pomičeš sve odabrane.</p>
+      <p className="hint">{t('Shift + klik dodaje ili makne oblik iz odabira. Povlačenjem pomičeš sve odabrane.')}</p>
     </aside>
   )
 }
@@ -491,8 +501,8 @@ function JoinSection({ join, lay }: { join: Join; lay: JoinLayout | null }) {
   const st = useStore.getState()
   return (
     <fieldset className="join-box">
-      <legend>Dio spoja</legend>
-      <NameField key={join.id} id="j-name" label="Naziv cijelog spoja" value={join.name} onCommit={(name) => st.updateJoin(join.id, { name })} />
+      <legend>{t('Dio spoja')}</legend>
+      <NameField key={join.id} id="j-name" label={t('Naziv cijelog spoja')} value={join.name} onCommit={(name) => st.updateJoin(join.id, { name })} />
       {lay?.error && <p className="warn">{lay.error}</p>}
       {lay && !lay.error && (
         <>
@@ -507,16 +517,16 @@ function JoinSection({ join, lay }: { join: Join; lay: JoinLayout | null }) {
               </label>
             ))}
           </div>
-          <p className="hint">Rubove spoja uključuješ i klikom na platnu. Brojevi se mogu promijeniti kad promijeniš oblik.</p>
+          <p className="hint">{t('Rubove spoja uključuješ i klikom na platnu. Brojevi se mogu promijeniti kad promijeniš oblik.')}</p>
         </>
       )}
-      <label className="field" htmlFor="j-mode"><span>Rubnjaci</span>
+      <label className="field" htmlFor="j-mode"><span>{t('Rubnjaci')}</span>
         <select id="j-mode" value={join.mode} onChange={(e) => st.updateJoin(join.id, { mode: e.target.value as Join['mode'] })}>
-          {(Object.keys(MODES) as Join['mode'][]).map((m) => <option key={m} value={m}>{MODES[m]}</option>)}
+          {(Object.keys(MODES) as Join['mode'][]).map((m) => <option key={m} value={m}>{t(MODES[m])}</option>)}
         </select></label>
       <div className="row">
-        <button type="button" onClick={() => { st.splitJoin(join.id); st.set({ toast: 'Spoj razdvojen. Svaki oblik opet ima svoje rubnjake.' }) }}>Razdvoji spoj</button>
-        <span className="hint">{join.members.length} oblika</span>
+        <button type="button" onClick={() => { st.splitJoin(join.id); st.set({ toast: t('Spoj razdvojen. Svaki oblik opet ima svoje rubnjake.') }) }}>{t('Razdvoji spoj')}</button>
+        <span className="hint">{t('{n} oblika', { n: join.members.length })}</span>
       </div>
     </fieldset>
   )

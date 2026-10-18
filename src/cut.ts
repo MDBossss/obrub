@@ -2,6 +2,7 @@
 import polygonClipping, { type Polygon } from 'polygon-clipping'
 import { cleanOutline, cmPerPx, layout, outlineToShape, toWorld, type Pt } from './geometry'
 import { ringBreaks } from './join'
+import { t } from './i18n'
 import { newId, useStore } from './store'
 import type { Shape } from './types'
 
@@ -96,9 +97,9 @@ export function cutShapes(a: Pt, b: Pt): string {
     joins = joins.map((j) => (j.members.includes(sh.id) ? { ...j, members: [...j.members.filter((m) => m !== sh.id), ...pieces.map((p) => p.id)] } : j))
     cut++
   }
-  if (!cut) return partial.length ? `Rez mora prijeći preko cijelog oblika (${partial.join(', ')}). Počni i završi izvan njega.` : ''
+  if (!cut) return partial.length ? t('Rez mora prijeći preko cijelog oblika ({names}). Počni i završi izvan njega.', { names: partial.join(', ') }) : ''
   // the smallest piece is most likely the excess: select it so Delete removes it
   const smallest = made.sort((x, y) => x.area - y.area)[0].id
   useStore.setState({ shapes, joins, selected: smallest, selection: [smallest] })
-  return `Prerezano oblika: ${cut}. Odabran je najmanji dio; obriši ga s Delete ako je višak.`
+  return t('Prerezano oblika: {n}. Odabran je najmanji dio; obriši ga s Delete ako je višak.', { n: cut })
 }

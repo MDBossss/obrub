@@ -4,6 +4,7 @@ import { useStore } from '../store'
 import { MODES, type Settings, type Shape } from '../types'
 import { planItems, totals, type PlanItem } from './Panels'
 import { Icon } from './Icon'
+import { getLang, t } from '../i18n'
 
 type Box = { x0: number; y0: number; x1: number; y1: number }
 
@@ -92,12 +93,12 @@ function ScaleBar({ vb, u }: { vb: { x: number; y: number; w: number; h: number 
 function Legend() {
   return (
     <div className="print-legend">
-      <span><i className="piece-L" />Rubnjak 100 cm</span>
-      <span><i className="piece-S" />Kratki (33 cm ili pola)</span>
-      <span><i className="piece-C" />Rezani komad</span>
-      <span><i className="nocurb" />Rub bez rubnjaka</span>
-      <span><i className="fill-asfalt" />Asfalt</span>
-      <span><i className="fill-trava" />Trava</span>
+      <span><i className="piece-L" />{t('Rubnjak 100 cm')}</span>
+      <span><i className="piece-S" />{t('Kratki (33 cm ili pola)')}</span>
+      <span><i className="piece-C" />{t('Rezani komad')}</span>
+      <span><i className="nocurb" />{t('Rub bez rubnjaka')}</span>
+      <span><i className="fill-asfalt" />{t('Asfalt')}</span>
+      <span><i className="fill-trava" />{t('Trava')}</span>
     </div>
   )
 }
@@ -111,50 +112,53 @@ export function PrintView() {
   const settings = useStore((s) => s.settings)
   const [detailed, setDetailed] = useState(false)
   const items = useMemo(() => planItems(shapes, joins, settings), [shapes, joins, settings])
-  const t = useMemo(() => totals(shapes, settings, joins), [shapes, settings, joins])
+  const tot = useMemo(() => totals(shapes, settings, joins), [shapes, settings, joins])
   if (!open) return null
   const close = () => useStore.getState().set({ printOpen: false })
-  const today = new Date().toLocaleDateString('hr-HR')
-  const reserveL = Math.ceil(t.buyL * 1.05), reserveS = Math.ceil(t.buyS * 1.05)
+  const hr = getLang() === 'hr'
+  const today = new Date().toLocaleDateString(hr ? 'hr-HR' : 'en-GB')
+  const reserveL = Math.ceil(tot.buyL * 1.05), reserveS = Math.ceil(tot.buyS * 1.05)
   const pages = 1 + (detailed ? items.length : 0)
+  // plural forms differ too much for one key: Croatian has 1 / 2–4 / 5+
+  const pageCount = hr ? `${pages} ${pages === 1 ? 'stranica' : pages < 5 ? 'stranice' : 'stranica'} A4` : `${pages} A4 page${pages === 1 ? '' : 's'}`
   return (
     <div className="print-root">
       <div className="print-bar">
-        <strong>Izvoz za ispis</strong>
-        <label className="check"><input type="checkbox" id="print-detailed" checked={detailed} onChange={(e) => setDetailed(e.target.checked)} />Detaljniji izvoz (stranica po dijelu)</label>
-        <span className="hint">{pages} {pages === 1 ? 'stranica' : pages < 5 ? 'stranice' : 'stranica'} A4</span>
+        <strong>{t('Izvoz za ispis')}</strong>
+        <label className="check"><input type="checkbox" id="print-detailed" checked={detailed} onChange={(e) => setDetailed(e.target.checked)} />{t('Detaljniji izvoz (stranica po dijelu)')}</label>
+        <span className="hint">{pageCount}</span>
         <span className="spacer" />
-        <button type="button" className="primary" onClick={() => window.print()}><Icon name="printer" /> Ispiši / spremi kao PDF</button>
-        <button type="button" className="icon-btn" aria-label="Zatvori" onClick={close}><Icon name="close" /></button>
+        <button type="button" className="primary" onClick={() => window.print()}><Icon name="printer" /> {t('Ispiši / spremi kao PDF')}</button>
+        <button type="button" className="icon-btn" aria-label={t('Zatvori')} onClick={close}><Icon name="close" /></button>
       </div>
-      <p className="print-tip hint">U prozoru za ispis odaberi pisač ili "Spremi kao PDF". Ako se boje ne vide, uključi "Pozadinske grafike".</p>
+      <p className="print-tip hint">{t('U prozoru za ispis odaberi pisač ili "Spremi kao PDF". Ako se boje ne vide, uključi "Pozadinske grafike".')}</p>
 
       <div className="print-pages">
         <section className="sheet">
           <header className="sheet-head">
-            <h1>Plan dvorišta: rubnjaci</h1>
+            <h1>{t('Plan dvorišta: rubnjaci')}</h1>
             <span>{today}</span>
           </header>
           <div className="sheet-plan"><PlanDrawing items={items} all={items} shapes={shapes} st={settings} names /></div>
           <Legend />
           <div className="sheet-totals">
-            <div><b>{reserveL}</b><span>kom. 100 cm<br />({t.buyL} + 5 % rezerve{t.halving ? `, ${t.halving} za rezanje na pola` : ''})</span></div>
-            {t.buyS > 0 && <div><b>{reserveS}</b><span>kom. 33 cm<br />({t.buyS} + 5 % rezerve)</span></div>}
-            <div><b>{f1(t.len / 100)} m</b><span>ukupno rubnjaka</span></div>
-            <div><b>{t.cuts}</b><span>rezova</span></div>
-            <div><b>{f1(t.weight / 1000)} t</b><span>težina</span></div>
-            <div><b>{f2(Math.ceil(t.buyL * 1.05) * settings.pL + Math.ceil(t.buyS * 1.05) * settings.pS)} €</b><span>s rezervom ({f2(t.cost)} € bez)</span></div>
+            <div><b>{reserveL}</b><span>{t('kom. 100 cm')}<br />({t('{n} + 5 % rezerve', { n: tot.buyL })}{tot.halving ? ', ' + t('{n} za rezanje na pola', { n: tot.halving }) : ''})</span></div>
+            {tot.buyS > 0 && <div><b>{reserveS}</b><span>{t('kom. 33 cm')}<br />({t('{n} + 5 % rezerve', { n: tot.buyS })})</span></div>}
+            <div><b>{f1(tot.len / 100)} m</b><span>{t('ukupno rubnjaka')}</span></div>
+            <div><b>{tot.cuts}</b><span>{t('rezova')}</span></div>
+            <div><b>{f1(tot.weight / 1000)} t</b><span>{t('težina')}</span></div>
+            <div><b>{f2(Math.ceil(tot.buyL * 1.05) * settings.pL + Math.ceil(tot.buyS * 1.05) * settings.pS)} €</b><span>{t('s rezervom ({cost} € bez)', { cost: f2(tot.cost) })}</span></div>
           </div>
           <table className="sheet-table">
-            <thead><tr><th>Dio</th><th>Duljina</th><th>100 cm</th><th>33 cm</th><th>Rezova</th><th>Cijena</th></tr></thead>
+            <thead><tr><th>{t('Dio')}</th><th>{t('Duljina')}</th><th>100 cm</th><th>33 cm</th><th>{t('Rezova')}</th><th>{t('Cijena')}</th></tr></thead>
             <tbody>
               {items.map((it) => { const c = pieceCounts(it.lay); return (
-                <tr key={it.id}><td><i className={`swatch fill-${it.kind}`} />{it.name}{it.members.length > 1 ? ` (${it.members.length} oblika)` : ''}</td>
+                <tr key={it.id}><td><i className={`swatch fill-${it.kind}`} />{it.name}{it.members.length > 1 ? ` (${t('{n} oblika', { n: it.members.length })})` : ''}</td>
                   <td className="n">{f1(it.lay.length / 100)} m</td><td className="n">{c.L}</td><td className="n">{c.S || '–'}</td><td className="n">{c.cuts}</td><td className="n">{f2(it.lay.cost)} €</td></tr>
               ) })}
             </tbody>
           </table>
-          <footer className="sheet-foot"><b>Obrub</b> · Cijene: 100 cm {f2(settings.pL)} €, 33 cm {f2(settings.pS)} €. Fuga {f1(settings.gap)} cm. Mjerilo crteža {settings.spx} px = {settings.scm} cm.</footer>
+          <footer className="sheet-foot"><b>Obrub</b> · {t('Cijene: 100 cm {pL} €, 33 cm {pS} €. Fuga {gap} cm. Mjerilo crteža {spx} px = {scm} cm.', { pL: f2(settings.pL), pS: f2(settings.pS), gap: f1(settings.gap), spx: settings.spx, scm: settings.scm })}</footer>
         </section>
 
         {detailed && items.map((it, n) => {
@@ -170,15 +174,15 @@ export function PrintView() {
               <div className="sheet-plan tall"><PlanDrawing items={[it]} all={items} shapes={shapes} st={settings} focus={focus} numbers /></div>
               <Legend />
               <div className="sheet-totals">
-                <div><b>{c.L}</b><span>kom. 100 cm{c.halving ? `, ${c.halving} na pola` : ''}</span></div>
-                {c.S > 0 && <div><b>{c.S}</b><span>kom. 33 cm</span></div>}
-                <div><b>{f1(it.lay.length / 100)} m</b><span>rubnjaka</span></div>
-                <div><b>{c.cuts}</b><span>rezova</span></div>
-                <div><b>{f2(it.lay.cost)} €</b><span>{mode ? MODES[mode] : ''}</span></div>
+                <div><b>{c.L}</b><span>{t('kom. 100 cm')}{c.halving ? ', ' + t('{n} na pola', { n: c.halving }) : ''}</span></div>
+                {c.S > 0 && <div><b>{c.S}</b><span>{t('kom. 33 cm')}</span></div>}
+                <div><b>{f1(it.lay.length / 100)} m</b><span>{t('rubnjaka')}</span></div>
+                <div><b>{c.cuts}</b><span>{t('rezova')}</span></div>
+                <div><b>{f2(it.lay.cost)} €</b><span>{mode ? t(MODES[mode]) : ''}</span></div>
               </div>
               {it.lay.warns.map((w) => <p key={w} className="warn">{w}</p>)}
               <table className="sheet-table">
-                <thead><tr><th>#</th><th>Rub</th><th>Duljina</th><th>Komadi redom</th><th>Napomena</th></tr></thead>
+                <thead><tr><th>#</th><th>{t('Rub')}</th><th>{t('Duljina')}</th><th>{t('Komadi redom')}</th><th>{t('Napomena')}</th></tr></thead>
                 <tbody>
                   {it.lay.runs.map((r) => (
                     <tr key={r.label}><td className="n"><span className="edge-num on">{runEdgeNo(it.lay, r.label)}</span></td><td>{r.label}</td><td className="n">{f1(r.len)} cm</td><td className="n wrap">{seqText(r.seq, r.S)}</td><td className="note">{r.note}</td></tr>

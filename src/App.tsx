@@ -10,12 +10,16 @@ import {
 import { loadPlan, startAutosave } from './persist'
 import { importSvgText } from './importSvg'
 import { redo, undo, useStore } from './store'
+import { t } from './i18n'
 
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
 
 export function App() {
   const [spaceDown, setSpaceDown] = useState(false)
+  const lang = useStore((s) => s.lang)
   const started = useRef(false)
+
+  useEffect(() => { document.documentElement.lang = lang }, [lang])
 
   useEffect(() => {
     if (started.current) return
@@ -79,7 +83,7 @@ export function App() {
       const text = e.clipboardData?.getData('text/plain') ?? ''
       if (!/<svg[\s>]/i.test(text)) return
       e.preventDefault()
-      useStore.getState().set({ toast: importSvgText(text.slice(text.search(/<svg[\s>]/i)), 'Zalijepljeno'), builderOpen: false })
+      useStore.getState().set({ toast: importSvgText(text.slice(text.search(/<svg[\s>]/i)), t('Zalijepljeno')).message, builderOpen: false })
       requestAnimationFrame(() => fitView())
     }
     window.addEventListener('paste', paste)
@@ -90,7 +94,8 @@ export function App() {
   }, [])
 
   return (
-    <div className="app">
+    // keyed by language so memoised layouts and their labels are rebuilt on a switch
+    <div className="app" key={lang}>
       <Canvas spaceDown={spaceDown} />
       <MeasureLabels />
       <RulerLabels />
@@ -102,7 +107,7 @@ export function App() {
       </header>
       <Inspector />
       <ZoomBar />
-      <button type="button" className="icon-btn help-btn" aria-label="Prečaci" title="Prečaci (?)" onClick={() => useStore.getState().set({ helpOpen: true })}><Icon name="help" /></button>
+      <button type="button" className="icon-btn help-btn" aria-label={t('Prečaci')} title={`${t('Prečaci')} (?)`} onClick={() => useStore.getState().set({ helpOpen: true })}><Icon name="help" /></button>
       <Builder />
       <SettingsDialog />
       <HelpDialog />

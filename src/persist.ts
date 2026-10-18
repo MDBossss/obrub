@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import { pauseHistory, resumeHistory, useStore } from './store'
 import { DEFAULT_SETTINGS, type Plan, type Shape } from './types'
 
@@ -72,7 +73,7 @@ export function startAutosave() {
           const r = await fetch('/api/plan', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...plan, baseRev: rev }) })
           if (r.status === 409) {
             applyRemote(await r.json())
-            useStore.getState().set({ saveState: 'saved', toast: 'Plan je u međuvremenu promijenjen u drugom prozoru ili na drugom uređaju. Učitana je najnovija verzija, pa zadnju izmjenu ponovi.' })
+            useStore.getState().set({ saveState: 'saved', toast: t('Plan je u međuvremenu promijenjen u drugom prozoru ili na drugom uređaju. Učitana je najnovija verzija, pa zadnju izmjenu ponovi.') })
             return
           }
           if (r.ok) rev = (await r.json()).rev

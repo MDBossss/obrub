@@ -1,6 +1,7 @@
 // Reads closed outlines from an SVG (Photoshop "Export As → SVG" / "Copy SVG") and splits each
 // into edges: a new edge starts where the outline turns sharply or switches between line and curve.
 import type { Pt } from './geometry'
+import { t } from './i18n'
 
 export interface Outline { name: string; pts: Pt[]; breaks: number[] }
 
@@ -217,7 +218,7 @@ function elementPath(el: Element): string {
 export function parseSvg(text: string, straightTol = 0.7): Outline[] {
   const doc = new DOMParser().parseFromString(text, 'image/svg+xml')
   const root = doc.querySelector('svg')
-  if (!root || doc.querySelector('parsererror')) throw new Error('Datoteka nije ispravan SVG.')
+  if (!root || doc.querySelector('parsererror')) throw new Error(t('Datoteka nije ispravan SVG.'))
   // map viewBox units onto the document's pixel size, the way Photoshop writes them
   let m: M = I
   const vb = (root.getAttribute('viewBox') ?? '').split(/[\s,]+/).map(Number)
